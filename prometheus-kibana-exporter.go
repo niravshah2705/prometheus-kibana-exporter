@@ -499,14 +499,14 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 				if err != nil {
 					log.Error(err)
 //									log.Info(i.Source.Title +" - 0")
-									kibanaIndexLatestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Add(0)		
+									kibanaIndexLatestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(0)		
 				}else{
 					if len(StructInterfaceSortObject.Hits.Hits) >0 {
 //									log.Info(i.Source.Title +" - " +strconv.FormatInt(int64(StructInterfaceSortObject.Hits.Hits[0].Sort[0]),10))		
-									kibanaIndexLatestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Add(float64(StructInterfaceSortObject.Hits.Hits[0].Sort[0]))
+									kibanaIndexLatestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(float64(StructInterfaceSortObject.Hits.Hits[0].Sort[0]))
 					}else{
 //									log.Info(i.Source.Title +" - 0")	
-									kibanaIndexLatestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Add(0)	
+									kibanaIndexLatestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(0)	
 					}
 				}
 			// Oldest time 
@@ -521,14 +521,14 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 				if err9 != nil {
 					log.Error(err9)
 //									log.Info(i.Source.Title +" - 0")
-									kibanaIndexOldestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Add(0)		
+									kibanaIndexOldestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(0)		
 				}else{
 					if len(StructInterfaceSortAscObject.Hits.Hits) >0 {
-//									log.Info(i.Source.Title +" - " +strconv.FormatInt(int64(StructInterfaceSortAscObject.Hits.Hits[0].Sort[0]),10))		
-									kibanaIndexOldestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Add(float64(StructInterfaceSortAscObject.Hits.Hits[0].Sort[0]))
+//									log.Debug(i.Source.Title +" - " +strconv.FormatInt(int64(StructInterfaceSortAscObject.Hits.Hits[0].Sort[0]),10))		
+									kibanaIndexOldestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(float64(StructInterfaceSortAscObject.Hits.Hits[0].Sort[0]))
 					}else{
 //									log.Info(i.Source.Title +" - 0")	
-									kibanaIndexOldestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Add(0)	
+									kibanaIndexOldestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(0)	
 					}
 				}
 			// Size Index 
@@ -543,11 +543,11 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 				if err99 != nil {
 					log.Error(err99)
 //									log.Info(i.Source.Title +" - 0")
-									kibanaIndexSize.With(prometheus.Labels{"indexpattern":i.Source.Title}).Add(0)		
+									kibanaIndexSize.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(0)		
 				}else{
 //					if len(StructInterfaceSizeObject.All.Total.Store.SizeInBytes) >0 {
 //									log.Info(i.Source.Title +" - " +strconv.FormatInt(int64(StructInterfaceSizeObject.All.Total.Store.SizeInBytes),10))		
-									kibanaIndexSize.With(prometheus.Labels{"indexpattern":i.Source.Title}).Add(float64(StructInterfaceSizeObject.All.Total.Store.SizeInBytes))
+									kibanaIndexSize.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(float64(StructInterfaceSizeObject.All.Total.Store.SizeInBytes))
 //					}else{
 //									log.Info(i.Source.Title +" - 0")	
 //									kibanaIndexSize.With(prometheus.Labels{"indexpattern":i.Source.Title}).Add(0)	
