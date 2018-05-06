@@ -1,9 +1,12 @@
 # prometheus-kibana-exporter
 Prometheus Kibana Exporter
 # Build & Execute
-git clone 
+```
+git clone https://github.com/niravshah2705/prometheus-kibana-exporter.git
 go build prometheus-kibana-exporter.go
 ./prometheus-kibana-exporter &>prometheus-kibana-exporter.log &
+```
+
 # Parameter
 ./prometheus-kibana-exporter --help
 
@@ -17,7 +20,7 @@ go build prometheus-kibana-exporter.go
 # Prometheus configuration
 The prometheus endpoint is resource consuming. Thus use longer scrape interval. 
 ```
-- job_name: kibana_dc_exporter
+- job_name: kibana_exporter
   honor_labels: true
   scrape_interval: 2m
   scrape_timeout: 50s
@@ -41,7 +44,7 @@ The metrics collection done as below:
 |---|---|
 |kibana_index_latest_data_time| For each index pattern, latest epoch time pushed for time filter field | 
 |kibana_index_oldest_data_time| For each index pattern, oldest epoch time pushed for time filter field,to check archiving  |
-|kibana_index_size_total| For each index pattern, Size consumed total (including replication factor) |
+|kibana_index_size_total| For each index pattern, Size consumed in bytes total (including replication factor) |
 
 # Sample Metrics logs
 ```
