@@ -14,14 +14,35 @@ import (
 	"net/url"
 	"errors"
 	"strconv"
-//	"time"
-
-	"github.com/prometheus/common/log"
+	"time"
+//    "gopkg.in/alecthomas/kingpin.v2"
+//	"github.com/prometheus/common/log"
+	log "github.com/sirupsen/logrus"
+//	"github.com/sirupsen/logrus"
 	"github.com/prometheus/common/version"
 	"github.com/prometheus/client_golang/prometheus"
 //	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 type Interface interface{}
+
+////////////////////////////////////////////////////////////////////////////////
+type KibanaServer struct {
+	Name        string `json:"name"`
+	ClusterName string `json:"cluster_name"`
+	ClusterUUID string `json:"cluster_uuid"`
+	Version     struct {
+		Number                           string    `json:"number"`
+		BuildFlavor                      string    `json:"build_flavor"`
+		BuildType                        string    `json:"build_type"`
+		BuildHash                        string    `json:"build_hash"`
+		BuildDate                        time.Time `json:"build_date"`
+		BuildSnapshot                    bool      `json:"build_snapshot"`
+		LuceneVersion                    string    `json:"lucene_version"`
+		MinimumWireCompatibilityVersion  string    `json:"minimum_wire_compatibility_version"`
+		MinimumIndexCompatibilityVersion string    `json:"minimum_index_compatibility_version"`
+	} `json:"version"`
+	Tagline string `json:"tagline"`
+}
 ////////////////////////////////////////////////////////////////////////////////
 type Sources struct {
     TimeFieldName string `json:"timeFieldName"`
@@ -48,6 +69,58 @@ type KibanaIndexList struct {
 		Hits     []AllHits `json:"hits"`
 	} `json:"hits"`
 } 
+/*type AllHits6 struct {
+     Index  string `json:"_index"`
+     Type   string `json:"_type"`
+     ID     string `json:"_id"`
+     Score  int    `json:"_score"`
+     Source struct {
+          IndexPattern Sources  `json:"index-pattern"`
+          Type string `json:"type"`
+     } `json:"_source"`
+} 
+type KibanaIndexList6 struct {
+	Took     int  `json:"took"`
+	TimedOut bool `json:"timed_out"`
+	Shards   struct {
+		Total      int `json:"total"`
+		Successful int `json:"successful"`
+		Skipped    int `json:"skipped"`
+		Failed     int `json:"failed"`
+	} `json:"_shards"`
+	Hits struct {
+		Total    int `json:"total"`
+		MaxScore int `json:"max_score"`
+		Hits     []AllHits6 `json:"hits"`
+	} `json:"hits"`
+}*/
+type KibanaIndexList6 struct {
+	Took     int  `json:"took"`
+	TimedOut bool `json:"timed_out"`
+	Shards   struct {
+		Total      int `json:"total"`
+		Successful int `json:"successful"`
+		Skipped    int `json:"skipped"`
+		Failed     int `json:"failed"`
+	} `json:"_shards"`
+	Hits struct {
+		Total    int `json:"total"`
+		MaxScore int `json:"max_score"`
+		Hits     []struct {
+			Index  string `json:"_index"`
+			Type   string `json:"_type"`
+			ID     string `json:"_id"`
+			Score  int    `json:"_score"`
+			Source struct {
+				IndexPattern struct {
+					TimeFieldName string `json:"timeFieldName"`
+					Title         string `json:"title"`
+				} `json:"index-pattern"`
+				Type string `json:"type"`
+			} `json:"_source"`
+		} `json:"hits"`
+	} `json:"hits"`
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 type SortHits struct {
@@ -131,10 +204,10 @@ type KibanaIndixSize struct {
 				Total                      int   `json:"total"`
 				TotalTimeInMillis          int   `json:"total_time_in_millis"`
 				TotalDocs                  int   `json:"total_docs"`
-				TotalSizeInBytes           int64 `json:"total_size_in_bytes"`
+				TotalSizeInBytes           int `json:"total_size_in_bytes"`
 				TotalStoppedTimeInMillis   int   `json:"total_stopped_time_in_millis"`
 				TotalThrottledTimeInMillis int   `json:"total_throttled_time_in_millis"`
-				TotalAutoThrottleInBytes   int64 `json:"total_auto_throttle_in_bytes"`
+				TotalAutoThrottleInBytes   int `json:"total_auto_throttle_in_bytes"`
 			} `json:"merges"`
 			Refresh struct {
 				Total             int `json:"total"`
@@ -204,7 +277,7 @@ type KibanaIndixSize struct {
 				Deleted int `json:"deleted"`
 			} `json:"docs"`
 			Store struct {
-				SizeInBytes          int64 `json:"size_in_bytes"`
+				SizeInBytes          int `json:"size_in_bytes"`
 				ThrottleTimeInMillis int   `json:"throttle_time_in_millis"`
 			} `json:"store"`
 			Indexing struct {
@@ -250,10 +323,10 @@ type KibanaIndixSize struct {
 				Total                      int   `json:"total"`
 				TotalTimeInMillis          int   `json:"total_time_in_millis"`
 				TotalDocs                  int   `json:"total_docs"`
-				TotalSizeInBytes           int64 `json:"total_size_in_bytes"`
+				TotalSizeInBytes           int   `json:"total_size_in_bytes"`
 				TotalStoppedTimeInMillis   int   `json:"total_stopped_time_in_millis"`
 				TotalThrottledTimeInMillis int   `json:"total_throttled_time_in_millis"`
-				TotalAutoThrottleInBytes   int64 `json:"total_auto_throttle_in_bytes"`
+				TotalAutoThrottleInBytes   int   `json:"total_auto_throttle_in_bytes"`
 			} `json:"merges"`
 			Refresh struct {
 				Total             int `json:"total"`
@@ -320,6 +393,264 @@ type KibanaIndixSize struct {
 	} `json:"_all"`
 	
 }
+
+type KibanaIndixSize6 struct {
+	Shards struct {
+		Total      int `json:"total"`
+		Successful int `json:"successful"`
+		Failed     int `json:"failed"`
+	} `json:"_shards"`
+	All struct {
+		Primaries struct {
+			Docs struct {
+				Count   int `json:"count"`
+				Deleted int `json:"deleted"`
+			} `json:"docs"`
+			Store struct {
+				SizeInBytes          int64 `json:"size_in_bytes"`
+				
+			} `json:"store"`
+			Indexing struct {
+				IndexTotal           int  `json:"index_total"`
+				IndexTimeInMillis    int  `json:"index_time_in_millis"`
+				IndexCurrent         int  `json:"index_current"`
+				IndexFailed          int  `json:"index_failed"`
+				DeleteTotal          int  `json:"delete_total"`
+				DeleteTimeInMillis   int  `json:"delete_time_in_millis"`
+				DeleteCurrent        int  `json:"delete_current"`
+				NoopUpdateTotal      int  `json:"noop_update_total"`
+				IsThrottled          bool `json:"is_throttled"`
+				ThrottleTimeInMillis int  `json:"throttle_time_in_millis"`
+			} `json:"indexing"`
+			Get struct {
+				Total               int `json:"total"`
+				TimeInMillis        int `json:"time_in_millis"`
+				ExistsTotal         int `json:"exists_total"`
+				ExistsTimeInMillis  int `json:"exists_time_in_millis"`
+				MissingTotal        int `json:"missing_total"`
+				MissingTimeInMillis int `json:"missing_time_in_millis"`
+				Current             int `json:"current"`
+			} `json:"get"`
+			Search struct {
+				OpenContexts        int `json:"open_contexts"`
+				QueryTotal          int `json:"query_total"`
+				QueryTimeInMillis   int `json:"query_time_in_millis"`
+				QueryCurrent        int `json:"query_current"`
+				FetchTotal          int `json:"fetch_total"`
+				FetchTimeInMillis   int `json:"fetch_time_in_millis"`
+				FetchCurrent        int `json:"fetch_current"`
+				ScrollTotal         int `json:"scroll_total"`
+				ScrollTimeInMillis  int `json:"scroll_time_in_millis"`
+				ScrollCurrent       int `json:"scroll_current"`
+				SuggestTotal        int `json:"suggest_total"`
+				SuggestTimeInMillis int `json:"suggest_time_in_millis"`
+				SuggestCurrent      int `json:"suggest_current"`
+			} `json:"search"`
+			Merges struct {
+				Current                    int   `json:"current"`
+				CurrentDocs                int   `json:"current_docs"`
+				CurrentSizeInBytes         int   `json:"current_size_in_bytes"`
+				Total                      int   `json:"total"`
+				TotalTimeInMillis          int   `json:"total_time_in_millis"`
+				TotalDocs                  int   `json:"total_docs"`
+				TotalSizeInBytes           int `json:"total_size_in_bytes"`
+				TotalStoppedTimeInMillis   int   `json:"total_stopped_time_in_millis"`
+				TotalThrottledTimeInMillis int   `json:"total_throttled_time_in_millis"`
+				TotalAutoThrottleInBytes   int `json:"total_auto_throttle_in_bytes"`
+			} `json:"merges"`
+			Refresh struct {
+				Total             int `json:"total"`
+				TotalTimeInMillis int `json:"total_time_in_millis"`
+				Listeners         int `json:"listeners"`
+			} `json:"refresh"`
+			Flush struct {
+				Total             int `json:"total"`
+				Periodic          int `json:"periodic"`
+				TotalTimeInMillis int `json:"total_time_in_millis"`
+			} `json:"flush"`
+			Warmer struct {
+				Current           int `json:"current"`
+				Total             int `json:"total"`
+				TotalTimeInMillis int `json:"total_time_in_millis"`
+			} `json:"warmer"`
+			QueryCache struct {
+				MemorySizeInBytes int `json:"memory_size_in_bytes"`
+				TotalCount        int `json:"total_count"`
+				HitCount          int `json:"hit_count"`
+				MissCount         int `json:"miss_count"`
+				CacheSize         int `json:"cache_size"`
+				CacheCount        int `json:"cache_count"`
+				Evictions         int `json:"evictions"`
+			} `json:"query_cache"`
+			Fielddata struct {
+				MemorySizeInBytes int `json:"memory_size_in_bytes"`
+				Evictions         int `json:"evictions"`
+			} `json:"fielddata"`
+			Completion struct {
+				SizeInBytes int `json:"size_in_bytes"`
+			} `json:"completion"`
+			Segments struct {
+				Count                     int `json:"count"`
+				MemoryInBytes             int `json:"memory_in_bytes"`
+				TermsMemoryInBytes        int `json:"terms_memory_in_bytes"`
+				StoredFieldsMemoryInBytes int `json:"stored_fields_memory_in_bytes"`
+				TermVectorsMemoryInBytes  int `json:"term_vectors_memory_in_bytes"`
+				NormsMemoryInBytes        int `json:"norms_memory_in_bytes"`
+				PointsMemoryInBytes       int `json:"points_memory_in_bytes"`
+				DocValuesMemoryInBytes    int `json:"doc_values_memory_in_bytes"`
+				IndexWriterMemoryInBytes  int `json:"index_writer_memory_in_bytes"`
+				VersionMapMemoryInBytes   int `json:"version_map_memory_in_bytes"`
+				FixedBitSetMemoryInBytes  int `json:"fixed_bit_set_memory_in_bytes"`
+				MaxUnsafeAutoIDTimestamp  int64 `json:"max_unsafe_auto_id_timestamp"`
+				FileSizes                 struct {
+				} `json:"file_sizes"`
+			} `json:"segments"`
+			Translog struct {
+				Operations  int `json:"operations"`
+				SizeInBytes int `json:"size_in_bytes"`
+				UncommittedOperations   int `json:"uncommitted_operations"`
+				UncommittedSizeInBytes  int `json:"uncommitted_size_in_bytes"`
+				EarliestLastModifiedAge int `json:"earliest_last_modified_age"`
+			} `json:"translog"`
+			RequestCache struct {
+				MemorySizeInBytes int `json:"memory_size_in_bytes"`
+				Evictions         int `json:"evictions"`
+				HitCount          int `json:"hit_count"`
+				MissCount         int `json:"miss_count"`
+			} `json:"request_cache"`
+			Recovery struct {
+				CurrentAsSource      int `json:"current_as_source"`
+				CurrentAsTarget      int `json:"current_as_target"`
+				ThrottleTimeInMillis int `json:"throttle_time_in_millis"`
+			} `json:"recovery"`
+		} `json:"primaries"`
+		Total struct {
+			Docs struct {
+				Count   int `json:"count"`
+				Deleted int `json:"deleted"`
+			} `json:"docs"`
+			Store struct {
+				SizeInBytes          int `json:"size_in_bytes"`
+				
+			} `json:"store"`
+			Indexing struct {
+				IndexTotal           int  `json:"index_total"`
+				IndexTimeInMillis    int  `json:"index_time_in_millis"`
+				IndexCurrent         int  `json:"index_current"`
+				IndexFailed          int  `json:"index_failed"`
+				DeleteTotal          int  `json:"delete_total"`
+				DeleteTimeInMillis   int  `json:"delete_time_in_millis"`
+				DeleteCurrent        int  `json:"delete_current"`
+				NoopUpdateTotal      int  `json:"noop_update_total"`
+				IsThrottled          bool `json:"is_throttled"`
+				ThrottleTimeInMillis int  `json:"throttle_time_in_millis"`
+			} `json:"indexing"`
+			Get struct {
+				Total               int `json:"total"`
+				TimeInMillis        int `json:"time_in_millis"`
+				ExistsTotal         int `json:"exists_total"`
+				ExistsTimeInMillis  int `json:"exists_time_in_millis"`
+				MissingTotal        int `json:"missing_total"`
+				MissingTimeInMillis int `json:"missing_time_in_millis"`
+				Current             int `json:"current"`
+			} `json:"get"`
+			Search struct {
+				OpenContexts        int `json:"open_contexts"`
+				QueryTotal          int `json:"query_total"`
+				QueryTimeInMillis   int `json:"query_time_in_millis"`
+				QueryCurrent        int `json:"query_current"`
+				FetchTotal          int `json:"fetch_total"`
+				FetchTimeInMillis   int `json:"fetch_time_in_millis"`
+				FetchCurrent        int `json:"fetch_current"`
+				ScrollTotal         int `json:"scroll_total"`
+				ScrollTimeInMillis  int `json:"scroll_time_in_millis"`
+				ScrollCurrent       int `json:"scroll_current"`
+				SuggestTotal        int `json:"suggest_total"`
+				SuggestTimeInMillis int `json:"suggest_time_in_millis"`
+				SuggestCurrent      int `json:"suggest_current"`
+			} `json:"search"`
+			Merges struct {
+				Current                    int   `json:"current"`
+				CurrentDocs                int   `json:"current_docs"`
+				CurrentSizeInBytes         int   `json:"current_size_in_bytes"`
+				Total                      int   `json:"total"`
+				TotalTimeInMillis          int   `json:"total_time_in_millis"`
+				TotalDocs                  int   `json:"total_docs"`
+				TotalSizeInBytes           int   `json:"total_size_in_bytes"`
+				TotalStoppedTimeInMillis   int   `json:"total_stopped_time_in_millis"`
+				TotalThrottledTimeInMillis int   `json:"total_throttled_time_in_millis"`
+				TotalAutoThrottleInBytes   int   `json:"total_auto_throttle_in_bytes"`
+			} `json:"merges"`
+			Refresh struct {
+				Total             int `json:"total"`
+				TotalTimeInMillis int `json:"total_time_in_millis"`
+				Listeners         int `json:"listeners"`
+			} `json:"refresh"`
+			Flush struct {
+				Total             int `json:"total"`
+				Periodic          int `json:"periodic"`
+				TotalTimeInMillis int `json:"total_time_in_millis"`
+			} `json:"flush"`
+			Warmer struct {
+				Current           int `json:"current"`
+				Total             int `json:"total"`
+				TotalTimeInMillis int `json:"total_time_in_millis"`
+			} `json:"warmer"`
+			QueryCache struct {
+				MemorySizeInBytes int `json:"memory_size_in_bytes"`
+				TotalCount        int `json:"total_count"`
+				HitCount          int `json:"hit_count"`
+				MissCount         int `json:"miss_count"`
+				CacheSize         int `json:"cache_size"`
+				CacheCount        int `json:"cache_count"`
+				Evictions         int `json:"evictions"`
+			} `json:"query_cache"`
+			Fielddata struct {
+				MemorySizeInBytes int `json:"memory_size_in_bytes"`
+				Evictions         int `json:"evictions"`
+			} `json:"fielddata"`
+			Completion struct {
+				SizeInBytes int `json:"size_in_bytes"`
+			} `json:"completion"`
+			Segments struct {
+				Count                     int `json:"count"`
+				MemoryInBytes             int `json:"memory_in_bytes"`
+				TermsMemoryInBytes        int `json:"terms_memory_in_bytes"`
+				StoredFieldsMemoryInBytes int `json:"stored_fields_memory_in_bytes"`
+				TermVectorsMemoryInBytes  int `json:"term_vectors_memory_in_bytes"`
+				NormsMemoryInBytes        int `json:"norms_memory_in_bytes"`
+				PointsMemoryInBytes       int `json:"points_memory_in_bytes"`
+				DocValuesMemoryInBytes    int `json:"doc_values_memory_in_bytes"`
+				IndexWriterMemoryInBytes  int `json:"index_writer_memory_in_bytes"`
+				VersionMapMemoryInBytes   int `json:"version_map_memory_in_bytes"`
+				FixedBitSetMemoryInBytes  int `json:"fixed_bit_set_memory_in_bytes"`
+				MaxUnsafeAutoIDTimestamp  int64 `json:"max_unsafe_auto_id_timestamp"`
+				FileSizes                 struct {
+				} `json:"file_sizes"`
+			} `json:"segments"`
+			Translog struct {
+				Operations  int `json:"operations"`
+				SizeInBytes int `json:"size_in_bytes"`
+				UncommittedOperations   int `json:"uncommitted_operations"`
+				UncommittedSizeInBytes  int `json:"uncommitted_size_in_bytes"`
+				EarliestLastModifiedAge int `json:"earliest_last_modified_age"`
+			} `json:"translog"`
+			RequestCache struct {
+				MemorySizeInBytes int `json:"memory_size_in_bytes"`
+				Evictions         int `json:"evictions"`
+				HitCount          int `json:"hit_count"`
+				MissCount         int `json:"miss_count"`
+			} `json:"request_cache"`
+			Recovery struct {
+				CurrentAsSource      int `json:"current_as_source"`
+				CurrentAsTarget      int `json:"current_as_target"`
+				ThrottleTimeInMillis int `json:"throttle_time_in_millis"`
+			} `json:"recovery"`
+		} `json:"total"`
+	} `json:"_all"`
+	
+}
+
 //////////////////////////////////////////////////////////////////////////////////
 
 type Exporter struct {
@@ -440,7 +771,7 @@ func getObject(path string,body io.Reader,StructInterface interface{}) error {
 		// handle err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
+	req.Header.Set("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Error(err)
@@ -474,22 +805,91 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 
 //	e.resetMetrics()
 //	e.scrape()
-	urlPath := "/.kibana/index-pattern/_search?size=1000"
-	body := strings.NewReader(`{   "_source": {         "includes": [ "title", "timeFieldName" ]     } }`)
+
+//      Check version
+	urlPath := "/"
+	ESversion := "5.6"
+        body := strings.NewReader(``)
+        var StructServerObject KibanaServer
+        var InterfaceServerObject *Interface
+        InterfaceServerObject = new(Interface)
+        *InterfaceServerObject = &StructServerObject
+
+        errS := getObject( e.URI + urlPath,body,&InterfaceServerObject)
+        if errS != nil {
+                log.Error(errS)
+                return
+        }
+    if StructServerObject.Version.Number > "6.3.0"{
+    	ESversion = "6.3"
+    }
+    log.Debug(StructServerObject.Version.Number)
+ //     Get Index List
+    urlPath = "/.kibana/_search?size=1000"
+	if ESversion == "6.3" {
+//		body = strings.NewReader(`{   "_source" : {       "includes": [ "index-pattern.timeFieldName","index-pattern.title",  "type" ]     }}`)
+		body = strings.NewReader(`{
+  "query": { 
+    "bool": { 
+      "filter": [
+        { "term": { "type":   "index-pattern"        }} 
+          
+      ]
+    }
+  },
+   "_source" : {       "includes": [  "index-pattern.title", "index-pattern.timeFieldName","type" ]     }}`)
+		log.Info("Detected 6.3.0 version while index search")
+	}else{
+		body = strings.NewReader(`{   "_source": {         "includes": [ "title", "timeFieldName" ]     } }`)
+	}
+	
+	
 	var StructInterfaceObject KibanaIndexList
+	var StructInterfaceObject6 KibanaIndexList6
+	
 	var InterfaceObject *Interface
 	InterfaceObject = new(Interface)
-	*InterfaceObject = &StructInterfaceObject
+
+    
+	if ESversion == "6.3" {
+		*InterfaceObject = &StructInterfaceObject6
+	}else{
+		*InterfaceObject = &StructInterfaceObject
+	}
 
 	err := getObject( e.URI + urlPath,body,&InterfaceObject)
 	if err != nil {
 		log.Error(err)
 		return
 	}
+
+	var SourceIndexes []Sources
+
+	if ESversion == "6.3"{
+		for _, i := range StructInterfaceObject6.Hits.Hits {
+			log.Info(i.Source.IndexPattern.Title + " " + i.Source.Type +" " +i.Source.IndexPattern.TimeFieldName )
+			if i.Source.Type == "index-pattern"{
+				var tempSource Sources
+				tempSource.Title = i.Source.IndexPattern.Title
+				tempSource.TimeFieldName = i.Source.IndexPattern.TimeFieldName
+				SourceIndexes = append(SourceIndexes,tempSource)
+			}
+		}
+	}else{
 		for _, i := range StructInterfaceObject.Hits.Hits {
+			log.Info(i.Source.Title + " " + i.Type +" " +i.Source.TimeFieldName )
+			if i.Type == "index-pattern"{
+				var tempSource Sources
+				tempSource.Title = i.Source.Title
+				tempSource.TimeFieldName = i.Source.TimeFieldName
+				SourceIndexes = append(SourceIndexes,tempSource)
+			}
+		}
+	}
+		for _, i := range SourceIndexes {
 			// Latest time 
-			urlPath := "/"+i.Source.Title+ "/_search"
-			body := strings.NewReader(`{ "_source": false, "sort": [{ "`+i.Source.TimeFieldName+`": { "order": "desc" } } ], "size": 1 }`)
+			urlPath := "/"+i.Title+ "/_search"
+			body := strings.NewReader(`{ "_source": false, "sort": [{ "`+i.TimeFieldName+`": { "order": "desc" } } ], "size": 1 }`)
 
 			var StructInterfaceSortObject KibanaIndexSort
 			var InterfaceSortObject *Interface
@@ -498,20 +898,20 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 				err := getObject( e.URI + urlPath,body,&InterfaceSortObject)
 				if err != nil {
 					log.Error(err)
-//									log.Info(i.Source.Title +" - 0")
-									kibanaIndexLatestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(0)		
+//									log.Info(i.Title +" - 0")
+									kibanaIndexLatestTime.With(prometheus.Labels{"indexpattern":i.Title}).Set(0)		
 				}else{
 					if len(StructInterfaceSortObject.Hits.Hits) >0 {
-//									log.Info(i.Source.Title +" - " +strconv.FormatInt(int64(StructInterfaceSortObject.Hits.Hits[0].Sort[0]),10))		
-									kibanaIndexLatestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(float64(StructInterfaceSortObject.Hits.Hits[0].Sort[0]))
+//									log.Info(i.Title +" - " +strconv.FormatInt(int64(StructInterfaceSortObject.Hits.Hits[0].Sort[0]),10))		
+									kibanaIndexLatestTime.With(prometheus.Labels{"indexpattern":i.Title}).Set(float64(StructInterfaceSortObject.Hits.Hits[0].Sort[0]))
 					}else{
-//									log.Info(i.Source.Title +" - 0")	
-									kibanaIndexLatestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(0)	
+//									log.Info(i.Title +" - 0")	
+									kibanaIndexLatestTime.With(prometheus.Labels{"indexpattern":i.Title}).Set(0)	
 					}
 				}
 			// Oldest time 
-			urlPath = "/"+i.Source.Title+ "/_search"
-			body = strings.NewReader(`{ "_source": false, "sort": [{ "`+i.Source.TimeFieldName+`": { "order": "asc" } } ], "size": 1 }`)
+			urlPath = "/"+i.Title+ "/_search"
+			body = strings.NewReader(`{ "_source": false, "sort": [{ "`+i.TimeFieldName+`": { "order": "asc" } } ], "size": 1 }`)
 
 			var StructInterfaceSortAscObject KibanaIndexSort
 			var InterfaceSortAscObject *Interface
@@ -520,37 +920,51 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 				err9 := getObject( e.URI + urlPath,body,&InterfaceSortAscObject)
 				if err9 != nil {
 					log.Error(err9)
-//									log.Info(i.Source.Title +" - 0")
-									kibanaIndexOldestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(0)		
+									log.Debug(i.Title +" - 0")
+									kibanaIndexOldestTime.With(prometheus.Labels{"indexpattern":i.Title}).Set(0)		
 				}else{
 					if len(StructInterfaceSortAscObject.Hits.Hits) >0 {
-//									log.Debug(i.Source.Title +" - " +strconv.FormatInt(int64(StructInterfaceSortAscObject.Hits.Hits[0].Sort[0]),10))		
-									kibanaIndexOldestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(float64(StructInterfaceSortAscObject.Hits.Hits[0].Sort[0]))
+									log.Debug(i.Title +" - " +strconv.FormatInt(int64(StructInterfaceSortAscObject.Hits.Hits[0].Sort[0]),10))		
+									kibanaIndexOldestTime.With(prometheus.Labels{"indexpattern":i.Title}).Set(float64(StructInterfaceSortAscObject.Hits.Hits[0].Sort[0]))
 					}else{
-//									log.Info(i.Source.Title +" - 0")	
-									kibanaIndexOldestTime.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(0)	
+									log.Debug(i.Title +" - 0")	
+									kibanaIndexOldestTime.With(prometheus.Labels{"indexpattern":i.Title}).Set(0)	
 					}
 				}
 			// Size Index 
-			urlPath = "/"+i.Source.Title+ "/_stats"
+			urlPath = "/"+i.Title+ "/_stats"
 			body = strings.NewReader(``)
 
 			var StructInterfaceSizeObject KibanaIndixSize
+			var StructInterfaceSizeObject6 KibanaIndixSize6
+
 			var InterfaceSizeObject *Interface
 			InterfaceSizeObject = new(Interface)
-			*InterfaceSizeObject = &StructInterfaceSizeObject
+
+				if ESversion == "6.3" {
+					*InterfaceSizeObject = &StructInterfaceSizeObject6
+				}else{
+					*InterfaceSizeObject = &StructInterfaceSizeObject
+				}
+
 				err99 := getObject( e.URI + urlPath,body,&InterfaceSizeObject)
 				if err99 != nil {
 					log.Error(err99)
-//									log.Info(i.Source.Title +" - 0")
-									kibanaIndexSize.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(0)		
+//									log.Info(i.Title +" - 0")
+									kibanaIndexSize.With(prometheus.Labels{"indexpattern":i.Title}).Set(0)		
 				}else{
 //					if len(StructInterfaceSizeObject.All.Total.Store.SizeInBytes) >0 {
-//									log.Info(i.Source.Title +" - " +strconv.FormatInt(int64(StructInterfaceSizeObject.All.Total.Store.SizeInBytes),10))		
-									kibanaIndexSize.With(prometheus.Labels{"indexpattern":i.Source.Title}).Set(float64(StructInterfaceSizeObject.All.Total.Store.SizeInBytes))
+//									log.Info(i.Title +" - " +strconv.FormatInt(int64(StructInterfaceSizeObject.All.Total.Store.SizeInBytes),10))		
+
+						if ESversion == "6.3" {
+									kibanaIndexSize.With(prometheus.Labels{"indexpattern":i.Title}).Set(float64(StructInterfaceSizeObject6.All.Total.Store.SizeInBytes))
+						}else{
+									kibanaIndexSize.With(prometheus.Labels{"indexpattern":i.Title}).Set(float64(StructInterfaceSizeObject.All.Total.Store.SizeInBytes))
+						}
+
 //					}else{
-//									log.Info(i.Source.Title +" - 0")	
-//									kibanaIndexSize.With(prometheus.Labels{"indexpattern":i.Source.Title}).Add(0)	
+//									log.Info(i.Title +" - 0")	
+//									kibanaIndexSize.With(prometheus.Labels{"indexpattern":i.Title}).Add(0)	
 //					}
 				}				
 		}
@@ -589,17 +1003,29 @@ func main() {
 				metricsPath          = flag.String("web.telemetry-path","/metrics", "Path under which to expose metrics.")
 				showVersion          = flag.Bool("version", false, "Show version and exit")
 				esURI                = flag.String("es.uri", "http://localhost:9200", "HTTP API address of an Elasticsearch node.")
-
+				loglevel			 = flag.Bool("debug",false,"Set up loglevel in debug")
 	)
+
 //	cpuChk.Set(65.3)
 	flag.Parse()
+//	origLogger.SetLevel(origLogger.DebugLevel)
+//	log := logrus.new()
+	fmt.Print("Listening to:" + *esURI +"\n")
+	fmt.Print("Add http://localhost"+ *listenAddress + *metricsPath +"\n")
 
 	if *showVersion {
 		fmt.Print(version.Print(Name))
 		os.Exit(0)
 	}
 //	hdFailures.With(prometheus.Labels{"device":"/dev/sda"}).Inc()
-
+//	log.SetLevel("debug")
+//	k := kingpin.New(*loglevel,"debug")
+	log.SetLevel(log.WarnLevel)
+	if *loglevel{
+		log.SetLevel(log.DebugLevel)
+	}
+	
+//	log.AddFlags(k)
 	exporter, err := NewExporter(*esURI)
 	if err != nil {
 		log.Fatal(err)
