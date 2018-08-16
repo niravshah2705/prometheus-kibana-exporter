@@ -12,6 +12,7 @@ go build prometheus-kibana-exporter.go
 
 |parameter|usage|
 |---|---|
+|-debug | Set up loglevel in debug |
 |-es.uri |HTTP API address of an Elasticsearch node. (default "http://localhost:9200") |
 |-version | Show version and exit |
 |-web.listen-address | Address to listen on for web interface and telemetry. (default ":9108")|
