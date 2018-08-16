@@ -823,6 +823,13 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
     if StructServerObject.Version.Number > "6.3.0"{
     	ESversion = "6.3"
     }
+    if StructServerObject.Version.Number > "6.1.0"{
+        ESversion = "6.3"
+    }
+    if StructServerObject.Version.Number > "6.0.0"{
+        ESversion = "6.3"
+    }
+
     log.Debug(StructServerObject.Version.Number)
  //     Get Index List
     urlPath = "/.kibana/_search?size=1000"
